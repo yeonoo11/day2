@@ -3,23 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>카운터</title>
+<title>부품 지도</title>
 <style>
-  body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; gap: 20px; }
-  #count { font-size: 4rem; }
-  button { font-size: 1.5rem; padding: 10px 30px; cursor: pointer; }
+  * { box-sizing: border-box; }
+  body { font-family: sans-serif; margin: 0; padding: 20px 16px; background: #eee; color: #222; }
+  h1 { font-size: 1.2rem; margin: 0 0 4px; }
+  .sub { color: #666; font-size: .9rem; margin: 0 0 16px; }
+  .layout { max-width: 760px; margin: 0 auto; }
+  .item { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+  .item > .part { flex: 1; min-width: 0; }
+  .tag { flex: 0 0 76px; text-align: center; font-size: .8rem; font-weight: bold; color: #fff; background: #3b6fd8; padding: 4px 0; border-radius: 12px; }
+  .part { outline: 2px dashed #3b6fd8; outline-offset: 3px; }
+  /* index.html 과 같은 스타일 */
+  header.part { background: #e4572e; color: #fff; padding: 16px 20px; text-align: center; }
+  header h1 { margin: 0; font-size: 1.4rem; }
+  nav.part { background: #fff; display: flex; justify-content: center; gap: 8px; padding: 8px; }
+  nav a { padding: 8px 16px; border-radius: 6px; color: #444; text-decoration: none; }
+  nav a.active { background: #ffe9e2; color: #e4572e; font-weight: bold; }
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 16px 24px; }
+  .card h2 { margin: 0 0 6px; font-size: 1.1rem; color: #e4572e; }
+  .card ol { margin: 0; padding-left: 28px; line-height: 1.8; }
+  .counter { text-align: center; }
+  #count { font-size: 3rem; }
+  button { font-size: 1.3rem; padding: 8px 26px; cursor: pointer; }
+  .footer-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 10px 20px; font-size: .9rem; color: #666; text-align: center; }
+  .legend { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px 16px; margin-top: 20px; }
+  .legend h2 { font-size: 1rem; margin: 0 0 8px; }
+  .legend ul { list-style: none; padding: 0; margin: 0; }
+  .legend li { padding: 6px 0; border-top: 1px solid #eee; display: flex; justify-content: space-between; gap: 12px; }
+  .legend li:first-child { border-top: 0; }
+  .yes { color: #1a7f37; font-weight: bold; }
+  .no { color: #999; }
 </style>
 </head>
 <body>
-  <div id="count">0</div>
-  <button id="btn">증가</button>
-  <script>
-    let count = 0;
-    const countEl = document.getElementById('count');
-    document.getElementById('btn').addEventListener('click', () => {
-      count += 2;
-      countEl.textContent = count;
-    });
-  </script>
+<div class="layout">
+  <h1>🗺️ 부품 지도</h1>
+  <p class="sub">index.html(내 취향 카드)의 부품에 이름표를 붙였어요. 점선 = 실제 부품 · 목록은 일부만 보여줘요.</p>
+
+  <div class="item">
+    <header class="part"><h1>🍊 내 취향 카드</h1></header>
+    <span class="tag">헤더</span>
+  </div>
+
+  <div class="item">
+    <nav class="part">
+      <a href="#" class="active">홈</a>
+      <a href="#">취향</a>
+      <a href="#">카드</a>
+    </nav>
+    <span class="tag">탭</span>
+  </div>
+
+  <div class="item">
+    <section class="card part">
+      <h2>🌴 제주대학교에 오신 것을 환영합니다</h2>
+      <div class="item">
+        <ol class="part">
+          <li>푸른 바다와 한라산 사이, 꿈이 자라는 곳 🌊🏔️</li>
+          <li>제주대학교는 제주를 대표하는 국립대학교입니다 🎓</li>
+          <li>… (카드당 10줄)</li>
+        </ol>
+        <span class="tag">목록</span>
+      </div>
+    </section>
+    <span class="tag">카드</span>
+  </div>
+
+  <div class="item">
+    <section class="card counter part">
+      <div id="count">0</div>
+      <div class="item">
+        <button class="part" id="btn">증가</button>
+        <span class="tag">버튼</span>
+      </div>
+    </section>
+    <span class="tag">카드</span>
+  </div>
+
+  <div class="item">
+    <div class="footer-card part">© 오수민 · 내 취향 카드</div>
+    <span class="tag">카드</span>
+  </div>
+
+  <div class="legend">
+    <h2>찾은 부품 요약</h2>
+    <ul>
+      <li><span>헤더</span><span class="yes">1개 · header</span></li>
+      <li><span>카드</span><span class="yes">12개 · 문구 카드 10 + 카운터 1 + 푸터 카드 1</span></li>
+      <li><span>버튼</span><span class="yes">1개 · #btn</span></li>
+      <li><span>입력창</span><span class="no">없음</span></li>
+      <li><span>탭</span><span class="yes">메뉴 3개 · 홈 / 취향 / 카드</span></li>
+      <li><span>목록</span><span class="yes">10개 · 카드마다 번호 목록 1개</span></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  let count = 0;
+  const countEl = document.getElementById('count');
+  document.getElementById('btn').addEventListener('click', () => {
+    count += 2;
+    countEl.textContent = count;
+  });
+</script>
 </body>
 </html>
