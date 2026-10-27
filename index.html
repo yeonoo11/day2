@@ -34,6 +34,12 @@
   @media (max-width: 700px) {
     .page { grid-template-columns: 1fr; grid-template-areas: "header" "nav" "section" "article" "photos" "aside" "footer"; }
   }
+  #chatBtn { position: fixed; right: 20px; bottom: 20px; z-index: 10; padding: 14px 20px; font-size: 1rem; border: 0; border-radius: 30px; background: #e4572e; color: #fff; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+  #chatModal { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; padding: 16px; }
+  #chatModal.open { display: flex; }
+  .chatBox { position: relative; width: 100%; max-width: 480px; height: min(640px, 90vh); background: #fff; border-radius: 14px; overflow: hidden; }
+  .chatBox iframe { width: 100%; height: 100%; border: 0; }
+  #chatClose { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(0,0,0,.4); color: #fff; font-size: 1.2rem; cursor: pointer; }
   #photos { grid-area: photos; background: #fff; border: 1px solid #f0d9b5; border-radius: 14px; padding: 20px; }
   #sform { display: flex; gap: 8px; margin-bottom: 8px; }
   #sform input { flex: 1; min-width: 0; padding: 10px; font-size: 1rem; border: 1px solid #e0c9a0; border-radius: 8px; }
@@ -152,6 +158,26 @@
   </footer>
 
 </div>
+
+<button id="chatBtn" type="button">💬 에이전트와 채팅</button>
+<div id="chatModal">
+  <div class="chatBox">
+    <button id="chatClose" type="button" aria-label="닫기">✕</button>
+    <iframe id="chatFrame" title="제주 특산물 에이전트 채팅"></iframe>
+  </div>
+</div>
+
+<script>
+  // 버튼을 누르면 agent.html 을 불러와 채팅 화면을 보여줘요.
+  const chatModal = document.getElementById('chatModal');
+  document.getElementById('chatBtn').addEventListener('click', () => {
+    const frame = document.getElementById('chatFrame');
+    if (!frame.getAttribute('src')) frame.src = 'agent.html';
+    chatModal.classList.add('open');
+  });
+  document.getElementById('chatClose').addEventListener('click', () => chatModal.classList.remove('open'));
+  chatModal.addEventListener('click', e => { if (e.target === chatModal) chatModal.classList.remove('open'); });
+</script>
 
 <script>
   // 이미지는 Vercel 서버리스 함수(/api/pixabay)가 환경변수 PIXABAY_KEY 로 가져와요.
