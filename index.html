@@ -72,6 +72,15 @@
       background: #fff; border-radius: 14px; overflow: hidden;
     }
     #reactiveBox iframe { width: 100%; height: 100%; border: 0; display: block; }
+    #reactiveBox.phone { max-width: 400px; }
+    #reactiveSize {
+      position: absolute; left: 8px; bottom: 8px; z-index: 2; display: flex; gap: 6px;
+    }
+    #reactiveSize button {
+      border: none; border-radius: 999px; padding: 10px 14px; font-size: 0.9rem; cursor: pointer;
+      background: rgba(0, 0, 0, 0.7); color: #fff;
+    }
+    #reactiveSize button.on { background: #2b5cd9; }
     #reactiveClose {
       position: absolute; right: 8px; bottom: 8px; z-index: 2;
       border: none; border-radius: 999px; padding: 10px 18px;
@@ -181,7 +190,8 @@
       #chatToggle { z-index: 30; }
       #reactiveBtn { left: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); width: 80px; height: 80px; font-size: 0.8rem; }
       #reactiveOverlay { padding: 0; }
-      #reactiveBox { max-width: none; height: 100dvh; border-radius: 0; }
+      #reactiveBox, #reactiveBox.phone { max-width: none; height: 100dvh; border-radius: 0; }
+      #reactiveSize { display: none; }
     }
   </style>
 </head>
@@ -259,8 +269,12 @@
 
   <button id="reactiveBtn" type="button" aria-label="반응형 메뉴 열기"><span class="icon">📱</span><span>반응형<br>메뉴</span></button>
   <div id="reactiveOverlay" hidden>
-    <div id="reactiveBox">
+    <div id="reactiveBox" class="phone">
       <iframe id="reactiveFrame" title="반응형 메뉴"></iframe>
+      <div id="reactiveSize">
+        <button type="button" data-size="phone" class="on">📱 모바일</button>
+        <button type="button" data-size="pc">🖥️ PC</button>
+      </div>
       <button id="reactiveClose" type="button">✕ 닫기</button>
     </div>
   </div>
@@ -275,6 +289,11 @@
       reactiveOverlay.hidden = false;
     });
     document.getElementById('reactiveClose').addEventListener('click', closeReactive);
+    // 📱/🖥️ 버튼: 팝업 폭을 바꿔 햄버거(모바일)와 가로 메뉴(PC)를 번갈아 확인
+    document.querySelectorAll('#reactiveSize button').forEach(btn => btn.addEventListener('click', () => {
+      document.getElementById('reactiveBox').classList.toggle('phone', btn.dataset.size === 'phone');
+      document.querySelectorAll('#reactiveSize button').forEach(b => b.classList.toggle('on', b === btn));
+    }));
     reactiveOverlay.addEventListener('click', e => { if (e.target === reactiveOverlay) closeReactive(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReactive(); });
 
