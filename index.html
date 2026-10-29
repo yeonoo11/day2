@@ -1,368 +1,140 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>제주 특산물 홍보관</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #f4f8f3;
-      color: #222;
-      line-height: 1.6;
-    }
-    .page {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: clamp(8px, 2vw, 20px);
-      display: grid;
-      gap: clamp(8px, 1.5vw, 16px);
-      grid-template-columns: 2fr 1fr;
-      grid-template-areas:
-        "header  header"
-        "nav     nav"
-        "section aside"
-        "article aside"
-        "gallery gallery"
-        "footer  footer";
-    }
-    #gallery { grid-area: gallery; background: #fff; border-radius: 12px; padding: 18px 20px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); }
-    .search { display: flex; gap: 8px; margin-bottom: 8px; }
-    .search input { flex: 1; padding: 10px 12px; font-size: 1rem; border: 1px solid #c9d1d9; border-radius: 8px; }
-    .search button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 8px; background: #2f6f3e; color: #fff; cursor: pointer; }
-    #gStatus { min-height: 1.5em; color: #555; font-size: 0.92rem; margin-bottom: 10px; }
-    .slider { max-width: 560px; margin: 0 auto; }
-    .slider img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: #dde3ea; display: block; }
-    #gPage { text-align: center; margin-top: 8px; color: #555; font-size: 0.9rem; }
-
-    #chatToggle {
-      position: fixed; right: 20px; bottom: 20px; z-index: 20;
-      border: none; border-radius: 999px; padding: 14px 22px;
-      background: #ff7b00; color: #fff; font-size: 1rem; font-weight: bold;
-      cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    }
-    #chatToggle:hover { background: #e66f00; }
-    #chatPanel {
-      position: fixed; right: 20px; bottom: 80px; z-index: 20;
-      width: 360px; height: 520px; max-width: calc(100vw - 24px); max-height: calc(100vh - 100px);
-      border-radius: 14px; overflow: hidden; background: #fff;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-    #chatPanel iframe { width: 100%; height: 100%; border: 0; display: block; }
-    #chatPanel[hidden] { display: none; }
-    #reactiveBtn {
-      position: fixed; left: 20px; bottom: 20px; z-index: 20;
-      width: 96px; height: 96px; border: none; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #4d8dff, #2b5cd9);
-      color: #fff; font-size: 0.9rem; font-weight: bold; line-height: 1.3;
-      cursor: pointer; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-    }
-    #reactiveBtn .icon { font-size: 1.8rem; }
-    #reactiveBtn:hover { transform: scale(1.06); }
-    #reactiveOverlay {
-      position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, 0.55);
-      display: flex; align-items: center; justify-content: center; padding: 16px;
-    }
-    #reactiveOverlay[hidden] { display: none; }
-    #reactiveBox {
-      position: relative; width: 100%; max-width: 960px; height: min(720px, 90vh);
-      background: #fff; border-radius: 14px; overflow: hidden;
-    }
-    #reactiveBox iframe { width: 100%; height: 100%; border: 0; display: block; }
-    #reactiveBox.phone { max-width: 400px; }
-    #reactiveSize {
-      position: absolute; left: 8px; bottom: 8px; z-index: 2; display: flex; gap: 6px;
-    }
-    #reactiveSize button {
-      border: none; border-radius: 999px; padding: 10px 14px; font-size: 0.9rem; cursor: pointer;
-      background: rgba(0, 0, 0, 0.7); color: #fff;
-    }
-    #reactiveSize button.on { background: #2b5cd9; }
-    #reactiveClose {
-      position: absolute; right: 8px; bottom: 8px; z-index: 2;
-      border: none; border-radius: 999px; padding: 10px 18px;
-      background: rgba(0, 0, 0, 0.7); color: #fff; font-size: 0.95rem; cursor: pointer;
-    }
-    header { grid-area: header; }
-    nav { grid-area: nav; }
-    #products { grid-area: section; }
-    #story { grid-area: article; }
-    aside { grid-area: aside; }
-    footer { grid-area: footer; }
-
-    header {
-      background: linear-gradient(135deg, #ff9f1c, #ff7b00);
-      color: #fff;
-      text-align: center;
-      padding: 32px 16px;
-      border-radius: 12px;
-    }
-    header h1 { margin: 0 0 6px; font-size: clamp(1.4rem, 4vw + 0.5rem, 2.2rem); }
-    header p { margin: 0; opacity: 0.95; }
-
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      background: #fff;
-      padding: 10px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    }
-    nav a {
-      text-decoration: none;
-      color: #2f6f3e;
-      background: #e6f3e8;
-      padding: 8px 18px;
-      border-radius: 999px;
-      font-weight: bold;
-    }
-    nav a:hover { background: #2f6f3e; color: #fff; }
-
-    section, article, aside {
-      background: #fff;
-      border-radius: 12px;
-      padding: 18px 20px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    }
-    h2 { margin: 0 0 12px; font-size: 1.3rem; color: #2f6f3e; }
-
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-    .item { border: 1px solid #e3ebe2; border-radius: 10px; padding: 12px; background: #fbfdfb; }
-    .item .emoji { font-size: 2rem; }
-    .item h3 { margin: 4px 0; font-size: 1.05rem; }
-    .item p { margin: 0; color: #555; font-size: 0.92rem; }
-    .item .season { margin-top: 6px; font-size: 0.8rem; color: #d96b00; font-weight: bold; }
-
-    article p { margin: 0 0 10px; }
-    article ul { margin: 0; padding-left: 20px; }
-
-    aside h2 { font-size: 1.1rem; }
-    aside ul { list-style: none; margin: 0 0 16px; padding: 0; }
-    aside li { padding: 6px 0; border-bottom: 1px dashed #dde6dc; font-size: 0.92rem; }
-    .like-btn {
-      width: 100%;
-      border: none;
-      background: #ffe3e8;
-      color: #d6336c;
-      padding: 10px;
-      border-radius: 999px;
-      font-size: 1.05rem;
-      cursor: pointer;
-    }
-    .like-btn:hover { background: #ffd0da; }
-
-    footer {
-      background: #2f6f3e;
-      color: #e6f3e8;
-      text-align: center;
-      padding: 16px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-    }
-
-    /* 태블릿: 오른쪽 aside를 좁게 */
-    @media (max-width: 960px) {
-      .page { grid-template-columns: 3fr 2fr; }
-    }
-
-    /* 모바일: 한 줄로 쌓기 */
-    @media (max-width: 720px) {
-      .page {
-        grid-template-columns: 1fr;
-        grid-template-areas: "header" "nav" "section" "article" "aside" "gallery" "footer";
-      }
-      header { padding: 22px 12px; }
-      nav { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      nav a { flex: none; padding: 10px 16px; }
-      .search { flex-direction: column; }
-      .search button, .like-btn { min-height: 44px; }
-      #chatToggle { right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); padding: 12px 18px; }
-      #chatPanel {
-        right: 0; left: 0; bottom: 0; top: 0;
-        width: 100%; height: 100%; max-width: none; max-height: none;
-        border-radius: 0;
-      }
-      #chatToggle { z-index: 30; }
-      #reactiveBtn { left: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); width: 80px; height: 80px; font-size: 0.8rem; }
-      #reactiveOverlay { padding: 0; }
-      #reactiveBox, #reactiveBox.phone { max-width: none; height: 100dvh; border-radius: 0; }
-      #reactiveSize { display: none; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>three.js Animation</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #05060d; }
+  canvas { display: block; }
+  #go {
+    position: fixed; top: 16px; right: 16px; padding: 10px 18px; border-radius: 8px;
+    background: rgba(40,60,140,.55); color: #dfe8ff; border: 1px solid #4a63d0;
+    font: 600 15px system-ui, sans-serif; text-decoration: none; z-index: 10;
+  }
+  #go:hover { background: rgba(70,100,220,.75); }
+  #hint {
+    position: fixed; left: 16px; bottom: 14px; color: #8fa3ff; font: 13px/1.4 system-ui, sans-serif;
+    opacity: .7; pointer-events: none;
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <h1>🍊 제주 특산물 홍보관</h1>
-      <p>바람과 햇살, 바다가 키운 제주의 맛을 만나보세요</p>
-    </header>
+<a id="go" href="space.html">🚀 우주 여행 시작</a>
+<div id="hint">마우스 이동: 시점 회전 · 드래그: 궤도 · 휠: 줌</div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    <nav>
-      <a href="#products">🛒 대표 특산물</a>
-      <a href="#story">📖 제주의 맛 이야기</a>
-      <a href="#season">📅 제철 달력</a>
-      <a href="#gallery">🖼️ 사진 검색</a>
-    </nav>
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x05060d, 0.035);
 
-    <section id="products">
-      <h2>🛒 대표 특산물</h2>
-      <div class="grid">
-        <div class="item"><div class="emoji">🍊</div><h3>감귤</h3><p>새콤달콤한 맛으로 제주를 대표하는 과일입니다.</p><div class="season">제철: 가을~겨울</div></div>
-        <div class="item"><div class="emoji">🍋</div><h3>한라봉</h3><p>향이 진하고 과즙이 풍부한 만감류입니다.</p><div class="season">제철: 겨울~봄</div></div>
-        <div class="item"><div class="emoji">🐖</div><h3>흑돼지</h3><p>쫄깃하고 고소한 맛의 제주 대표 고기입니다.</p><div class="season">제철: 사계절</div></div>
-        <div class="item"><div class="emoji">🐟</div><h3>갈치</h3><p>은빛 갈치로 만드는 구이와 조림이 인기입니다.</p><div class="season">제철: 여름~가을</div></div>
-        <div class="item"><div class="emoji">🍡</div><h3>오메기떡</h3><p>차조로 만든 쫀득한 제주 전통 떡입니다.</p><div class="season">제철: 사계절</div></div>
-        <div class="item"><div class="emoji">🥜</div><h3>당근·감자·마늘</h3><p>제주 땅에서 자란 신선한 농산물입니다.</p><div class="season">제철: 품목별 상이</div></div>
-      </div>
-    </section>
+const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(0, 2, 12);
 
-    <article id="story">
-      <h2>📖 제주의 맛 이야기</h2>
-      <p>화산섬 제주의 토양과 따뜻한 바닷바람은 독특한 맛을 가진 농수산물을 길러냅니다. 정성껏 키운 특산물은 선물용으로도, 집밥 재료로도 사랑받고 있습니다.</p>
-      <p>특산물을 더 즐겁게 고르는 방법</p>
-      <ul>
-        <li>제철 시기를 확인하면 가장 맛있을 때 먹을 수 있어요.</li>
-        <li>선물용은 포장과 배송 기간을 미리 살펴보세요.</li>
-        <li>여행 중 시장과 직판장을 들러 직접 맛보고 고르는 것도 좋아요.</li>
-      </ul>
-    </article>
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
 
-    <aside id="season">
-      <h2>📅 제철 달력</h2>
-      <ul>
-        <li>🍊 11~1월 : 감귤</li>
-        <li>🍋 1~4월 : 한라봉</li>
-        <li>🐟 7~10월 : 갈치</li>
-        <li>🍡 연중 : 오메기떡</li>
-      </ul>
-      <h2>👍 이 사이트가 좋았다면</h2>
-      <button id="likeBtn" class="like-btn">❤️ 좋아요 <span id="likeCount">0</span></button>
-    </aside>
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.6;
 
-    <section id="gallery">
-      <h2>🖼️ 제주 사진 검색</h2>
-      <div class="search">
-        <input id="gQuery" type="text" placeholder="검색어 입력 (예: jeju, tangerine)">
-        <button id="gSearch">검색</button>
-      </div>
-      <div id="gStatus">검색어를 입력하면 사진을 1초마다 한 장씩 보여드려요.</div>
-      <div class="slider">
-        <img id="gImg" alt="" hidden>
-      </div>
-      <div id="gPage"></div>
-    </section>
+// 중앙 토러스 매듭
+const knot = new THREE.Mesh(
+  new THREE.TorusKnotGeometry(2, 0.6, 220, 32),
+  new THREE.MeshStandardMaterial({ color: 0x6c7bff, metalness: 0.7, roughness: 0.2 })
+);
+scene.add(knot);
 
-    <footer>
-      © 2026 제주 특산물 홍보관 · 제철과 가격은 변동될 수 있으니 구매 전 확인해 주세요.
-    </footer>
-  </div>
+// 와이어프레임 외곽 구
+const shell = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(4.2, 2),
+  new THREE.MeshBasicMaterial({ color: 0x3a4aff, wireframe: true, transparent: true, opacity: 0.25 })
+);
+scene.add(shell);
 
-  <button id="chatToggle">💬 에이전트와 채팅</button>
-  <div id="chatPanel" hidden>
-    <iframe id="chatFrame" title="제주 여행 에이전트 채팅"></iframe>
-  </div>
+// 궤도를 도는 작은 구들
+const orbiters = [];
+for (let i = 0; i < 6; i++) {
+  const color = new THREE.Color().setHSL(i / 6, 0.8, 0.6);
+  const m = new THREE.Mesh(
+    new THREE.SphereGeometry(0.28, 24, 24),
+    new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.8 })
+  );
+  const light = new THREE.PointLight(color, 25, 14);
+  m.add(light);
+  scene.add(m);
+  orbiters.push({ m, r: 5.5 + i * 0.5, speed: 0.4 + i * 0.12, tilt: i * 0.5, phase: i });
+}
 
-  <button id="reactiveBtn" type="button" aria-label="반응형 메뉴 열기"><span class="icon">📱</span><span>반응형<br>메뉴</span></button>
-  <div id="reactiveOverlay" hidden>
-    <div id="reactiveBox" class="phone">
-      <iframe id="reactiveFrame" title="반응형 메뉴"></iframe>
-      <div id="reactiveSize">
-        <button type="button" data-size="phone" class="on">📱 모바일</button>
-        <button type="button" data-size="pc">🖥️ PC</button>
-      </div>
-      <button id="reactiveClose" type="button">✕ 닫기</button>
-    </div>
-  </div>
+// 파티클 필드
+const N = 2500;
+const pos = new Float32Array(N * 3);
+const col = new Float32Array(N * 3);
+const c = new THREE.Color();
+for (let i = 0; i < N; i++) {
+  const r = 8 + Math.random() * 30;
+  const th = Math.random() * Math.PI * 2;
+  const ph = Math.acos(2 * Math.random() - 1);
+  pos.set([r * Math.sin(ph) * Math.cos(th), r * Math.sin(ph) * Math.sin(th), r * Math.cos(ph)], i * 3);
+  c.setHSL(0.55 + Math.random() * 0.25, 0.8, 0.65);
+  col.set([c.r, c.g, c.b], i * 3);
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+pGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+const points = new THREE.Points(pGeo, new THREE.PointsMaterial({
+  size: 0.08, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false,
+  blending: THREE.AdditiveBlending
+}));
+scene.add(points);
 
-  <script>
-    // 큰 원형 버튼을 누르면 reactive.html 을 불러와 보여줘요.
-    const reactiveOverlay = document.getElementById('reactiveOverlay');
-    const reactiveFrame = document.getElementById('reactiveFrame');
-    function closeReactive() { reactiveOverlay.hidden = true; }
-    document.getElementById('reactiveBtn').addEventListener('click', () => {
-      if (!reactiveFrame.getAttribute('src')) reactiveFrame.src = 'reactive.html';
-      reactiveOverlay.hidden = false;
-    });
-    document.getElementById('reactiveClose').addEventListener('click', closeReactive);
-    // 📱/🖥️ 버튼: 팝업 폭을 바꿔 햄버거(모바일)와 가로 메뉴(PC)를 번갈아 확인
-    document.querySelectorAll('#reactiveSize button').forEach(btn => btn.addEventListener('click', () => {
-      document.getElementById('reactiveBox').classList.toggle('phone', btn.dataset.size === 'phone');
-      document.querySelectorAll('#reactiveSize button').forEach(b => b.classList.toggle('on', b === btn));
-    }));
-    reactiveOverlay.addEventListener('click', e => { if (e.target === reactiveOverlay) closeReactive(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReactive(); });
+scene.add(new THREE.AmbientLight(0x404060, 1.2));
 
-    const chatToggle = document.getElementById('chatToggle');
-    const chatPanel = document.getElementById('chatPanel');
-    const chatFrame = document.getElementById('chatFrame');
-    chatToggle.addEventListener('click', () => {
-      const opening = chatPanel.hidden;
-      if (opening && !chatFrame.src) chatFrame.src = 'agent.html';
-      chatPanel.hidden = !opening;
-      chatToggle.textContent = opening ? '✖ 채팅 닫기' : '💬 에이전트와 채팅';
-    });
+const clock = new THREE.Clock();
+function tick() {
+  const t = clock.getElapsedTime();
 
-    let likes = 0;
-    const likeCount = document.getElementById('likeCount');
-    document.getElementById('likeBtn').addEventListener('click', () => {
-      likes++;
-      likeCount.textContent = likes;
-    });
+  knot.rotation.x = t * 0.3;
+  knot.rotation.y = t * 0.5;
+  const s = 1 + Math.sin(t * 1.5) * 0.06;
+  knot.scale.setScalar(s);
 
-    // 사진 검색 슬라이더 (API Key는 서버의 /api/pixabay 가 환경변수로 처리)
-    const SLIDE_MS = 1000;
-    const gQuery = document.getElementById('gQuery');
-    const gStatus = document.getElementById('gStatus');
-    const gImg = document.getElementById('gImg');
-    const gPage = document.getElementById('gPage');
-    let images = [];
-    let index = 0;
-    let timer = null;
+  shell.rotation.y = -t * 0.1;
+  shell.rotation.x = t * 0.05;
 
-    function showSlide() {
-      const img = images[index];
-      gImg.src = img.webformatURL;
-      gImg.alt = img.tags;
-      gImg.hidden = false;
-      gPage.textContent = `${index + 1} / ${images.length}`;
-    }
+  for (const o of orbiters) {
+    const a = t * o.speed + o.phase;
+    o.m.position.set(
+      Math.cos(a) * o.r,
+      Math.sin(a) * o.r * Math.sin(o.tilt),
+      Math.sin(a) * o.r * Math.cos(o.tilt)
+    );
+  }
 
-    function startSlideshow() {
-      clearInterval(timer);
-      gImg.hidden = true;
-      gPage.textContent = '';
-      if (!images.length) return;
-      index = 0;
-      showSlide();
-      timer = setInterval(() => {
-        index = (index + 1) % images.length;
-        showSlide();
-      }, SLIDE_MS);
-    }
+  points.rotation.y = t * 0.02;
+  points.rotation.x = Math.sin(t * 0.1) * 0.1;
 
-    async function searchImages() {
-      const q = gQuery.value.trim();
-      if (!q) { gStatus.textContent = '검색어를 입력해 주세요.'; return; }
-      gStatus.textContent = '검색 중...';
-      try {
-        const res = await fetch('/api/pixabay?q=' + encodeURIComponent(q));
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || `오류 (${res.status})`);
-        images = data.hits;
-        gStatus.textContent = images.length ? `"${q}" 검색 결과 ${images.length}장 · 1초마다 넘어갑니다` : '검색 결과가 없습니다.';
-        startSlideshow();
-      } catch (e) {
-        gStatus.textContent = e.message;
-      }
-    }
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+tick();
 
-    document.getElementById('gSearch').addEventListener('click', searchImages);
-    gQuery.addEventListener('keydown', e => { if (e.key === 'Enter') searchImages(); });
-  </script>
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
 </body>
 </html>
